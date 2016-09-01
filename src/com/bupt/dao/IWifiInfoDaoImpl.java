@@ -22,12 +22,12 @@ public class IWifiInfoDaoImpl implements IWifiInfoDao{
 	}
 
 	@Override
-	public void saveWifiInfoToDB() {
+	public void saveInfoToRecord() {
 		String sql = "insert into record(wifi_id,wifi_ipv4,wifi_ipv4_port,time) values(?,?,?,?)";
 	}
 
 	@Override
-	public void getInfoInDB() {
+	public void getInfoFromRecord(String wifi_id) {
 		String sql = "select wifi_ipv4,wifi_ipv4_port from record where wifi_id=?";
 	}
 

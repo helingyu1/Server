@@ -60,15 +60,20 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		byte[] bytes = buffer.array();
 		// step2:解析数据
 		char swt = (char) bytes[0];
-		if (swt == 0) {
+		if (swt == 0) { //写数据库
+			System.out.println("test:进入分支【1】");
 			store_to_database();
-		} else if (swt == 99) {
+		} else if (swt == 99) { // 检测服务器是否在线
+			System.out.println("test:进入分支【2】");
 			detect_alive();
-		} else if (swt > 100 && swt < 128) {
+		} else if (swt > 100 && swt < 128) { // 第三方发送控制命令到服务器
+			System.out.println("test:进入分支【3】");
 			outside_send_to_socket();
-		} else if (swt >= 1 && swt < 128) {
+		} else if (swt >= 1 && swt < 128) { // 查看多个插座是否在线
+			System.out.println("test:进入分支【4】");
 			send_to_socket();
-		} else if (swt >= 128) {
+		} else if (swt >= 128) { // 数据包不做处理直接发给手机
+			System.out.println("test:进入分支【5】");
 			send_to_mobile();
 		}
 		// String body = buffer.getString(decoder);
@@ -101,8 +106,12 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 
 	/**
 	 * 写入数据库(从收到的包中解析出wifi_id,wifi_ipv4,wifi_ipv4_port)
+	 * 写两张表 record 和 heartnumber
 	 */
 	public void store_to_database() {
+		
+		//step1:写heartnumber表
+		//step2:写record表
 
 	}
 
@@ -110,6 +119,12 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 	 * 发往插座(从数据库中提取出wifi_ipv4,wifi_ipv4_port填充到数据包中)
 	 */
 	public void send_to_socket() {
+		
+		// step1:在record表中查询wifi_ipv4,wifi_ipv4_port
+		
+		// step2:根据查出ip 端口号，向其发送信息，测试是否在线
+		
+		// step3:向手机发送响应信息
 
 	}
 
@@ -117,17 +132,27 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 	 * 发送手机(数据包不作处理直接发往手机)
 	 */
 	public void send_to_mobile() {
-
+		// 收到消息后，直接原封不动原路径返回
 	}
 
+	/**
+	 * 检测本服务器是否在线
+	 */
 	public void detect_alive() {
-
+		// 收到请求，添加时间信息，返回
+		// 若收到的消息 recv_buf[18]==0x5f && recv_buf[19]==0x3f :heartbeat reply success!
 	}
 
 	/**
 	 * 
 	 */
 	public void outside_send_to_socket() {
-
+		// 跟sent_to_socket差不多
+	}
+	public static void main(String[] args){
+		char a = 0x62;
+		if(a==98)
+			System.out.println("11");
+		
 	}
 }
