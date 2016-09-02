@@ -1,4 +1,9 @@
 package com.bupt.entity;
+/**
+ * 该实体对应Record表中记录
+ * @author helingyu
+ *
+ */
 
 public class Record {
 

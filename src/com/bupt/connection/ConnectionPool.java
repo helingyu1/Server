@@ -50,8 +50,8 @@ public class ConnectionPool {
 			prop.load(fis);
 			jdbcDriver = (String) prop.get("jdbcDriver");
 			dbUrl = (String) prop.get("dbUrl");
-			dbUsername = (String) prop.get("dbUsername");
-			dbPassword = (String) prop.get("dbPassword");
+			dbUsername = (String) prop.get("username");
+			dbPassword = (String) prop.get("password");
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

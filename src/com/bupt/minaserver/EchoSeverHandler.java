@@ -1,14 +1,29 @@
 package com.bupt.minaserver;
 
+import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
 import org.apache.mina.core.buffer.IoBuffer;
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
+import com.bupt.entity.AcessPoint;
+import com.bupt.service.RequestService;
+import com.bupt.utils.Helper;
+
 public class EchoSeverHandler extends IoHandlerAdapter {
+	// service
+	RequestService service = new RequestService();
+
+	// 数据偏移量
+	private static final int MAC_OFFSET = 14;
+	private static final int ACTION_OFFSET = 36;// outside方法里用
+	private static final int PARA_OFFSET = 20;
+
+	// 标志
+	private static final int NO_SOCKET_ADDR = 4;
+	private static final int NO_ERROR = 0;
 
 	public static final CharsetDecoder decoder = (Charset.forName("UTF-8"))
 			.newDecoder();
@@ -56,103 +71,48 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		// *********************************************** 接收数据
 		// step1:读取收到的数据
 		IoBuffer buffer = (IoBuffer) message;
-		// 收到的字节数组
-		byte[] bytes = buffer.array();
+		String str = buffer.getString(decoder);
+		String[] recv = Helper.hexToStringArray(str);
+		
+		// 得到wifi_id
+		StringBuffer sb = new StringBuffer();
+		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
+			sb.append(recv[i]);
+		}
+		String mac_id = new String(sb);
+		InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();
+		AcessPoint ap = new AcessPoint(addr.getAddress().getHostAddress(),
+				addr.getPort(), mac_id,recv);
+		System.out.println(ap);
+
 		// step2:解析数据
-		char swt = (char) bytes[0];
-		if (swt == 0) { //写数据库
+		int swt = Integer.parseInt(recv[0], 16);
+		if (swt == 0) { // 写数据库
 			System.out.println("test:进入分支【1】");
-			store_to_database();
+			service.store_to_database(session,ap);
 		} else if (swt == 99) { // 检测服务器是否在线
 			System.out.println("test:进入分支【2】");
-			detect_alive();
+			service.detect_alive(ap);
 		} else if (swt > 100 && swt < 128) { // 第三方发送控制命令到服务器
 			System.out.println("test:进入分支【3】");
-			outside_send_to_socket();
+			service.outside_send_to_socket(ap);
 		} else if (swt >= 1 && swt < 128) { // 查看多个插座是否在线
 			System.out.println("test:进入分支【4】");
-			send_to_socket();
+			service.send_to_socket(ap);
 		} else if (swt >= 128) { // 数据包不做处理直接发给手机
 			System.out.println("test:进入分支【5】");
-			send_to_mobile();
+			service.send_to_mobile(ap);
 		}
-		// String body = buffer.getString(decoder);
-		// 注意：当客户使用不依赖于MINA库的情况下，以下官方推
-		// 荐的读取方法会在数据首部出现几个字节的未知乱码
-		// message.toString()
-		// System.out.println("【NOTE】>>>>>> 收到客户端的数据：" + body);
-		//
-		// // *********************************************** 回复数据
-		// String strToClient = "Hello，我是Server，我的时间戳是"
-		// + System.currentTimeMillis();
-		// byte[] res = strToClient.getBytes("UTF-8");
-		// // 组织IoBuffer数据包的方法：本方法才可以正确地让客户端UDP收到byte数组
-		// IoBuffer buf = IoBuffer.wrap(res);
-		//
-		// // 向客户端写数据
-		// WriteFuture future = session.write(buf);
-		// // 在100毫秒超时间内等待写完成
-		// future.awaitUninterruptibly(100);
-		// // The message has been written successfully
-		// if (future.isWritten()) {
-		// // send sucess!
-		// }
-		// // The messsage couldn't be written out completely for some reason.
-		// // (e.g. Connection is closed)
-		// else {
-		// System.out.println("[IMCORE]回复给客户端的数据发送失败！");
-		// }
 	}
+	
 
-	/**
-	 * 写入数据库(从收到的包中解析出wifi_id,wifi_ipv4,wifi_ipv4_port)
-	 * 写两张表 record 和 heartnumber
-	 */
-	public void store_to_database() {
-		
-		//step1:写heartnumber表
-		//step2:写record表
+	public static void main(String[] args) {
 
-	}
+		String hex = "1111";
+		String[] arr = Helper.hexToStringArray(hex);
+		System.out.println(arr.length);
+		for (int i = 0; i < arr.length; i++)
+			System.out.println(arr[i]);
 
-	/**
-	 * 发往插座(从数据库中提取出wifi_ipv4,wifi_ipv4_port填充到数据包中)
-	 */
-	public void send_to_socket() {
-		
-		// step1:在record表中查询wifi_ipv4,wifi_ipv4_port
-		
-		// step2:根据查出ip 端口号，向其发送信息，测试是否在线
-		
-		// step3:向手机发送响应信息
-
-	}
-
-	/**
-	 * 发送手机(数据包不作处理直接发往手机)
-	 */
-	public void send_to_mobile() {
-		// 收到消息后，直接原封不动原路径返回
-	}
-
-	/**
-	 * 检测本服务器是否在线
-	 */
-	public void detect_alive() {
-		// 收到请求，添加时间信息，返回
-		// 若收到的消息 recv_buf[18]==0x5f && recv_buf[19]==0x3f :heartbeat reply success!
-	}
-
-	/**
-	 * 
-	 */
-	public void outside_send_to_socket() {
-		// 跟sent_to_socket差不多
-	}
-	public static void main(String[] args){
-		char a = 0x62;
-		if(a==98)
-			System.out.println("11");
-		
 	}
 }

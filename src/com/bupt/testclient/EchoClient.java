@@ -19,7 +19,8 @@ public class EchoClient {
 		// 循环发送数据给服务端
 		while (true) {
 			// 要发送的数据
-			String toServer = "Hi，我是客户端，我的时间戳" + System.currentTimeMillis();
+//			String toServer = "Hi，我是客户端，我的时间戳" + System.currentTimeMillis();
+			String toServer="6D000000000000000000000000001afe34f754e10000000000000000000000000000000000";
 			byte[] soServerBytes = toServer.getBytes("UTF-8");
 
 			// 开始发送
