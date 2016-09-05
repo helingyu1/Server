@@ -3,6 +3,7 @@ package com.bupt.minaserver;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.Arrays;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -71,8 +72,10 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		// *********************************************** 接收数据
 		// step1:读取收到的数据
 		IoBuffer buffer = (IoBuffer) message;
-		String str = buffer.getString(decoder);
-		String[] recv = Helper.hexToStringArray(str);
+		System.out.println(Arrays.toString(buffer.array()));
+//		String str = buffer.getString(decoder);
+//		String[] recv = Helper.hexToStringArray(str);
+		byte[] recv = buffer.array();
 		
 		// 得到wifi_id
 		StringBuffer sb = new StringBuffer();
@@ -86,20 +89,21 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		System.out.println(ap);
 
 		// step2:解析数据
-		int swt = Integer.parseInt(recv[0], 16);
-		if (swt == 0) { // 写数据库
+//		int swt = Integer.parseInt(recv[0], 16);
+		int swt = recv[0];
+		if (swt == 0) { // 功能1：写插座信息到数据库
 			System.out.println("test:进入分支【1】");
 			service.store_to_database(session,ap);
-		} else if (swt == 99) { // 检测服务器是否在线
+		} else if (swt == 99) { // 功能2：检测服务器是否在线
 			System.out.println("test:进入分支【2】");
 			service.detect_alive(ap);
-		} else if (swt > 100 && swt < 128) { // 第三方发送控制命令到服务器
+		} else if (swt > 100 && swt < 128) { // 功能3：第三方发送控制命令到服务器
 			System.out.println("test:进入分支【3】");
 			service.outside_send_to_socket(ap);
-		} else if (swt >= 1 && swt < 128) { // 查看多个插座是否在线
+		} else if (swt >= 1 && swt < 128) { // 功能4：查看多个插座是否在线
 			System.out.println("test:进入分支【4】");
 			service.send_to_socket(ap);
-		} else if (swt >= 128) { // 数据包不做处理直接发给手机
+		} else if (swt >= 128) { // 功能5：数据包不做处理直接发给手机
 			System.out.println("test:进入分支【5】");
 			service.send_to_mobile(ap);
 		}

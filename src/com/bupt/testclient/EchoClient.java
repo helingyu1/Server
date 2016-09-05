@@ -20,11 +20,14 @@ public class EchoClient {
 		while (true) {
 			// 要发送的数据
 //			String toServer = "Hi，我是客户端，我的时间戳" + System.currentTimeMillis();
-			String toServer="6D000000000000000000000000001afe34f754e10000000000000000000000000000000000";
-			byte[] soServerBytes = toServer.getBytes("UTF-8");
+//			String toServer="6D000000000000000000000000001afe34f754e10000000000000000000000000000000000";
+			String toServer="6300000000000000000000000000000000000000";//服务器是否在线
+//			byte[] soServerBytes = toServer.getBytes("UTF-8");
+			byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
 			// 开始发送
-			boolean ok = UDPUtils.send(soServerBytes, soServerBytes.length);
+//			boolean ok = UDPUtils.send(soServerBytes, soServerBytes.length);
+			boolean ok = UDPUtils.send(aa, aa.length);
 			if (ok)
 				System.out.println("发往服务端的信息已送出.");
 			else

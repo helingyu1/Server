@@ -179,11 +179,12 @@ public class DBDaoImpl {
 		// Date date = new Date();
 		// updateInHeartnumber("aabbccddeeff");
 //		System.out.println(System.currentTimeMillis() / 1000);
-		Record record = new Record();
-		record.setWifi_id("aabbccddeeff");
-		record.setWifi_ipv4(192);
-		record.setWifi_ipv4_port(8080);	
-		replaceToRecord(record);
+//		Record record = new Record();
+//		record.setWifi_id("aabbccddeeff");
+//		record.setWifi_ipv4(192);
+//		record.setWifi_ipv4_port(8080);	
+//		replaceToRecord(record);
+		System.out.println(Integer.toHexString(2016));
 	}
 
 }
