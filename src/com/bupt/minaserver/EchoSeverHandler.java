@@ -96,7 +96,7 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			service.store_to_database(session,ap);
 		} else if (swt == 99) { // 功能2：检测服务器是否在线
 			System.out.println("test:进入分支【2】");
-			service.detect_alive(ap);
+			service.detect_alive(session,ap);
 		} else if (swt > 100 && swt < 128) { // 功能3：第三方发送控制命令到服务器
 			System.out.println("test:进入分支【3】");
 			service.outside_send_to_socket(ap);

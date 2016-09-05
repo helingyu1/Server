@@ -1,9 +1,15 @@
 package com.bupt.service;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 
 import com.bupt.entity.AcessPoint;
@@ -70,10 +76,10 @@ public class RequestService {
 	/**
 	 * 检测本服务器是否在线
 	 */
-	public static void detect_alive(AcessPoint ap) {
-		String[] rtn = new String[20];
+	public void detect_alive(IoSession session,AcessPoint ap) {
+		byte[] rtn = new byte[20];
 		for(int i=0;i<rtn.length;i++)
-			rtn[i] = "00";
+			rtn[i] = 0x00;
 		// 收到请求，添加时间信息，返回
 		// 获取当前时间信息
 		Calendar cal = Calendar.getInstance();
@@ -83,13 +89,39 @@ public class RequestService {
 		String hour = Helper.fill(Integer.toHexString(cal.get(Calendar.HOUR_OF_DAY)),2,'0');
 		String min = Helper.fill(Integer.toHexString(cal.get(Calendar.MINUTE)),2,'0');
 		String sec = Helper.fill(Integer.toHexString(cal.get(Calendar.SECOND)),2,'0');
-		rtn[6] = year.substring(2, 4);//年份低字节
-		rtn[7] = year.substring(0,2);//年份高字节
-		rtn[8] = month;
-		rtn[9] = day;
-		rtn[10] = hour;
-		rtn[11] = min;
-		rtn[12] = sec;
+		
+		rtn[6] = (byte)Integer.parseInt(year.substring(2, 4),16);//年份低字节
+		rtn[7] = (byte)Integer.parseInt(year.substring(0,2),16);//年份高字节
+		rtn[8] = (byte)(Integer.parseInt(month,16));
+		rtn[9] = (byte)(Integer.parseInt(day,16));
+		rtn[10] = (byte)(Integer.parseInt(hour,16));
+		rtn[11] = (byte)(Integer.parseInt(min,16));
+		rtn[12] = (byte)Integer.parseInt(sec,16);
+		IoBuffer buffer = IoBuffer.wrap(rtn);
+		
+		WriteFuture future = session.write(rtn);
+//		SocketAddress addr = new InetSocketAddress("127.0,0,1", ((InetSocketAddress)session.getRemoteAddress()).getPort());
+//		
+//		WriteFuture future = session.write(rtn, addr);
+		System.out.println(((InetSocketAddress)session.getRemoteAddress()).getPort());
+		future.awaitUninterruptibly();
+		//判断消息是否发送完成
+		if(future.isWritten()){
+			System.out.println("发送成功。。。");
+			ReadFuture rf = session.read();
+			//等待消息响应
+			rf.awaitUninterruptibly();
+			//是否响应成功
+			if(rf.isDone()){
+				System.out.println("接收成功。。。");
+				Object message = rf.getMessage();
+				IoBuffer buf = (IoBuffer)message;
+				System.out.println(buf.array());
+				System.out.println(Arrays.toString(buffer.array()));
+			}
+		}else{
+			System.out.println("失败了？");
+		}
 		System.out.println(Arrays.toString(rtn));
 		// 若收到的消息 recv_buf[18]==0x5f && recv_buf[19]==0x3f :heartbeat reply
 		// success!
@@ -108,6 +140,9 @@ public class RequestService {
 		// 跟sent_to_socket差不多
 	}
 	public static void main(String[] args){
-		detect_alive(null);
+		String a = "e";
+		byte b = (byte)Integer.parseInt(a, 16);
+		System.out.println(b);
+		//detect_alive(null);
 	}
 }

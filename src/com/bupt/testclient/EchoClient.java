@@ -24,17 +24,20 @@ public class EchoClient {
 			String toServer="6300000000000000000000000000000000000000";//服务器是否在线
 //			byte[] soServerBytes = toServer.getBytes("UTF-8");
 			byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-
 			// 开始发送
 //			boolean ok = UDPUtils.send(soServerBytes, soServerBytes.length);
 			boolean ok = UDPUtils.send(aa, aa.length);
-			if (ok)
+			if (ok){
 				System.out.println("发往服务端的信息已送出.");
+				Thread.sleep(5000);
+				UDPUtils.send(aa, aa.length);
+				System.out.println("再一次发出");
+			}
 			else
 				System.out.println("发往服务端的信息没有成功发出！！！");
 
 			// 3000秒后进入下一次循环
-			Thread.sleep(3000);
+			Thread.sleep(100000);
 		}
 
 	}
