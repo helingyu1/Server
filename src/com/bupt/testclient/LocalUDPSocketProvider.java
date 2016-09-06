@@ -16,6 +16,7 @@ public class LocalUDPSocketProvider {
 
 	public void initSocket() {
 		try {
+			System.out.println("????");
 			// UDP本地监听端口（如果为0将表示由系统分配，否则使用指定端口）
 			this.localUDPSocket = new DatagramSocket(0);
 			// 调用connect之后，每次send时DatagramPacket就不需要设计目标主机的ip和port了

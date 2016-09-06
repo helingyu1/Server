@@ -1,6 +1,9 @@
 package com.bupt.testclient;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+
+import com.bupt.utils.Helper;
 
 public class EchoClient {
 
@@ -19,19 +22,21 @@ public class EchoClient {
 		// 循环发送数据给服务端
 		while (true) {
 			// 要发送的数据
-//			String toServer = "Hi，我是客户端，我的时间戳" + System.currentTimeMillis();
-//			String toServer="6D000000000000000000000000001afe34f754e10000000000000000000000000000000000";
-			String toServer="6300000000000000000000000000000000000000";//服务器是否在线
+//			String toServer="6300000000000000000000000000000000000000";//服务器是否在线
 //			byte[] soServerBytes = toServer.getBytes("UTF-8");
-			byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-			// 开始发送
+//			byte[] aa = {0x63,0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+			
+//			byte[] aa = {0x63,0x63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
+			
+			char[] aa = {0x63,0xe0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
+			byte[] b = Helper.getBytes(aa);
+//			System.out.println("客户端转后的byte数组："+Arrays.toString(b));
+//			System.out.println("重新转成char数组："+Arrays.toString(Helper.getChars(b)));
+// 开始发送
 //			boolean ok = UDPUtils.send(soServerBytes, soServerBytes.length);
-			boolean ok = UDPUtils.send(aa, aa.length);
+			boolean ok = UDPUtils.send(b, b.length);
 			if (ok){
 				System.out.println("发往服务端的信息已送出.");
-				Thread.sleep(5000);
-				UDPUtils.send(aa, aa.length);
-				System.out.println("再一次发出");
 			}
 			else
 				System.out.println("发往服务端的信息没有成功发出！！！");

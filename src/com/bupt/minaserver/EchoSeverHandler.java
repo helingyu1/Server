@@ -6,6 +6,7 @@ import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 
 import org.apache.mina.core.buffer.IoBuffer;
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
@@ -13,6 +14,12 @@ import com.bupt.entity.AcessPoint;
 import com.bupt.service.RequestService;
 import com.bupt.utils.Helper;
 
+/**
+ * 该类接收并处理不同类型的消息
+ * 发送接收用byte[],转成char[]来操作
+ * @author helingyu
+ *
+ */
 public class EchoSeverHandler extends IoHandlerAdapter {
 	// service
 	RequestService service = new RequestService();
@@ -71,16 +78,20 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			throws Exception {
 		// *********************************************** 接收数据
 		// step1:读取收到的数据
-		IoBuffer buffer = (IoBuffer) message;
-		System.out.println(Arrays.toString(buffer.array()));
-//		String str = buffer.getString(decoder);
-//		String[] recv = Helper.hexToStringArray(str);
-		byte[] recv = buffer.array();
+		System.out.println(message);
+		IoBuffer buffer = (IoBuffer) message;	
+		// 接收到的byte数组
+		byte[] recv_b = buffer.array();
+		int size = buffer.limit();
+		System.out.println("size:"+size);
 		
+		// 转成字符数组
+		char[] recv = Helper.getChars(recv_b);
+		System.out.println("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
 		// 得到wifi_id
 		StringBuffer sb = new StringBuffer();
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
-			sb.append(recv[i]);
+			sb.append(Helper.char2StringArray(recv)[i]);
 		}
 		String mac_id = new String(sb);
 		InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();
@@ -112,11 +123,15 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 
 	public static void main(String[] args) {
 
-		String hex = "1111";
-		String[] arr = Helper.hexToStringArray(hex);
-		System.out.println(arr.length);
-		for (int i = 0; i < arr.length; i++)
-			System.out.println(arr[i]);
+//		String hex = "1111";
+//		String[] arr = Helper.hexToStringArray(hex);
+//		System.out.println(arr.length);
+//		for (int i = 0; i < arr.length; i++)
+//			System.out.println(arr[i]);
+		char[] aa = {0x63,0x63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
+		String b = new String(aa);
+		System.out.println(b);
+
 
 	}
 }

@@ -2,6 +2,9 @@ package com.bupt.testclient;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.Arrays;
+
+import com.bupt.utils.Helper;
 
 public class LocalUDPDataReciever {
 
@@ -49,10 +52,19 @@ public class LocalUDPDataReciever {
 			localUDPSocket.receive(packet);
 
 			// 解析服务端发过来的数据
-			String pFromServer = new String(packet.getData(), 0,
-					packet.getLength(), "UTF-8");
-			System.out.println("【NOTE】>>>>>> 收到服务端的消息："
-					+ pFromServer);
+//			String pFromServer = new String(packet.getData(), 0,
+//					packet.getLength(), "UTF-8");
+//			System.out.println("【NOTE】>>>>>> 收到服务端的消息："
+//					+ pFromServer);
+			System.out.println("【NOTE】>>>>>> 收到服务端的消息："+Arrays.toString(Helper.char2StringArray(Helper.getChars(packet.getData()))));
+			char[] aa = {0x63,0xe0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
+			byte[] b = Helper.getBytes(aa);
+			boolean ok = UDPUtils.send(b, b.length);
+			if (ok){
+				System.out.println("响应信息已送出.");
+			}
+			else
+				System.out.println("发往服务端的信息没有成功发出！！！");
 		}
 	}
 

@@ -26,9 +26,10 @@ public class RequestService {
 	private DaoService service = new DaoService();
 
 	// 数据偏移量
-	private static final int MAC_OFFSET = 14; 	//mac地址起始地址
+	private static final int COMID_OFFSET = 1; // comid起始地址（8字节）
+	private static final int MAC_OFFSET = 14; // mac地址起始地址(6字节)
 	private static final int ACTION_OFFSET = 36;// outside方法里用，动作参数起始地址（1字节），0是关，1是开
-	private static final int PARA_OFFSET = 20;	//设备密码起始地址，16字节（目前都是0？）
+	private static final int PARA_OFFSET = 20; // 设备密码起始地址，16字节（目前都是0？）
 
 	// 标志
 	private static final int NO_SOCKET_ADDR = 4;
@@ -76,53 +77,47 @@ public class RequestService {
 	/**
 	 * 检测本服务器是否在线
 	 */
-	public void detect_alive(IoSession session,AcessPoint ap) {
-		byte[] rtn = new byte[20];
-		for(int i=0;i<rtn.length;i++)
+	public void detect_alive(IoSession session, AcessPoint ap) {
+		char[] rtn = new char[20];
+		for (int i = 0; i < rtn.length; i++)
 			rtn[i] = 0x00;
 		// 收到请求，添加时间信息，返回
 		// 获取当前时间信息
 		Calendar cal = Calendar.getInstance();
-		String year = Helper.fill(Integer.toHexString(cal.get(Calendar.YEAR)),4,'0');
-		String month = Helper.fill(Integer.toHexString(cal.get(Calendar.MONTH)+1),2,'0');
-		String day = Helper.fill(Integer.toHexString(cal.get(Calendar.DATE)),2,'0');
-		String hour = Helper.fill(Integer.toHexString(cal.get(Calendar.HOUR_OF_DAY)),2,'0');
-		String min = Helper.fill(Integer.toHexString(cal.get(Calendar.MINUTE)),2,'0');
-		String sec = Helper.fill(Integer.toHexString(cal.get(Calendar.SECOND)),2,'0');
-		
-		rtn[6] = (byte)Integer.parseInt(year.substring(2, 4),16);//年份低字节
-		rtn[7] = (byte)Integer.parseInt(year.substring(0,2),16);//年份高字节
-		rtn[8] = (byte)(Integer.parseInt(month,16));
-		rtn[9] = (byte)(Integer.parseInt(day,16));
-		rtn[10] = (byte)(Integer.parseInt(hour,16));
-		rtn[11] = (byte)(Integer.parseInt(min,16));
-		rtn[12] = (byte)Integer.parseInt(sec,16);
-		IoBuffer buffer = IoBuffer.wrap(rtn);
-		
-		WriteFuture future = session.write(rtn);
-//		SocketAddress addr = new InetSocketAddress("127.0,0,1", ((InetSocketAddress)session.getRemoteAddress()).getPort());
-//		
-//		WriteFuture future = session.write(rtn, addr);
-		System.out.println(((InetSocketAddress)session.getRemoteAddress()).getPort());
-		future.awaitUninterruptibly();
-		//判断消息是否发送完成
-		if(future.isWritten()){
-			System.out.println("发送成功。。。");
-			ReadFuture rf = session.read();
-			//等待消息响应
-			rf.awaitUninterruptibly();
-			//是否响应成功
-			if(rf.isDone()){
-				System.out.println("接收成功。。。");
-				Object message = rf.getMessage();
-				IoBuffer buf = (IoBuffer)message;
-				System.out.println(buf.array());
-				System.out.println(Arrays.toString(buffer.array()));
-			}
-		}else{
-			System.out.println("失败了？");
+		String year = Helper.fill(Integer.toHexString(cal.get(Calendar.YEAR)),
+				4, '0');
+		String month = Helper.fill(
+				Integer.toHexString(cal.get(Calendar.MONTH) + 1), 2, '0');
+		String day = Helper.fill(Integer.toHexString(cal.get(Calendar.DATE)),
+				2, '0');
+		String hour = Helper.fill(
+				Integer.toHexString(cal.get(Calendar.HOUR_OF_DAY)), 2, '0');
+		String min = Helper.fill(Integer.toHexString(cal.get(Calendar.MINUTE)),
+				2, '0');
+		String sec = Helper.fill(Integer.toHexString(cal.get(Calendar.SECOND)),
+				2, '0');
+
+		rtn[6] = (char) Integer.parseInt(year.substring(2, 4), 16);// 年份低字节
+		rtn[7] = (char) Integer.parseInt(year.substring(0, 2), 16);// 年份高字节
+		rtn[8] = (char) (Integer.parseInt(month, 16));
+		rtn[9] = (char) (Integer.parseInt(day, 16));
+		rtn[10] = (char) (Integer.parseInt(hour, 16));
+		rtn[11] = (char) (Integer.parseInt(min, 16));
+		rtn[12] = (char) Integer.parseInt(sec, 16);
+		System.out.println(Arrays.toString(Helper.char2StringArray(rtn)));
+		WriteFuture writeFuture = send(session, rtn);
+		if (writeFuture.isWritten()) {
+			System.out.println("heartbeat reply  success!");
+			// ReadFuture readFuture = session.read();
+			// readFuture.awaitUninterruptibly();
+			// if(readFuture.isRead()){
+			// System.out.println("???????????");
+			// Object message = readFuture.getMessage();
+			// IoBuffer buffer = (IoBuffer)message;
+			// char recv[] = Helper.getChars(buffer.array());
+			// System.out.println("服务器再次收到的消息："+Helper.char2StringArray(recv));
+			// }
 		}
-		System.out.println(Arrays.toString(rtn));
 		// 若收到的消息 recv_buf[18]==0x5f && recv_buf[19]==0x3f :heartbeat reply
 		// success!
 	}
@@ -139,10 +134,26 @@ public class RequestService {
 		System.out.println("mac_id is:" + mac_id);
 		// 跟sent_to_socket差不多
 	}
-	public static void main(String[] args){
+
+	/**
+	 * 向客户端发送信息
+	 * 
+	 * @param session
+	 * @param data
+	 * @return
+	 */
+	public WriteFuture send(IoSession session, char[] data) {
+		byte[] toSend = Helper.getBytes(data);
+		IoBuffer buffer = IoBuffer.wrap(toSend);
+		WriteFuture future = session.write(buffer);
+		future.awaitUninterruptibly(100);
+		return future;
+	}
+
+	public static void main(String[] args) {
 		String a = "e";
-		byte b = (byte)Integer.parseInt(a, 16);
+		byte b = (byte) Integer.parseInt(a, 16);
 		System.out.println(b);
-		//detect_alive(null);
+		// detect_alive(null);
 	}
 }
