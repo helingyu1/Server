@@ -89,7 +89,7 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		
 		// 转成字符数组
 		char[] recv = Helper.getChars(recv_b);
-		logger.debug("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
+//		logger.debug("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
 		// 得到wifi_id
 		StringBuffer sb = new StringBuffer();
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
@@ -97,9 +97,13 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		}
 		String mac_id = new String(sb);
 		InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();
-		AcessPoint ap = new AcessPoint(addr.getAddress().getHostAddress(),
+//		AcessPoint ap = new AcessPoint(addr.getAddress().getHostAddress(),
+//				addr.getPort(), mac_id,recv);
+		String ipStr = addr.getAddress().getHostAddress();
+		long ip = Helper.ipToLong(ipStr);
+		AcessPoint ap = new AcessPoint(ip,
 				addr.getPort(), mac_id,recv);
-		System.out.println(ap);
+//		System.out.println(ap);
 
 		// step2:解析数据
 		int swt = recv[0];
@@ -111,10 +115,10 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			service.detect_alive(session,ap);
 		} else if (swt > 100 && swt < 128) { // 功能3：第三方发送控制命令到服务器
 			logger.debug("test:进入分支【3】");
-			service.outside_send_to_socket(ap);
+			service.outside_send_to_socket(session,ap);
 		} else if (swt >= 1 && swt < 128) { // 功能4：查看多个插座是否在线
 			logger.debug("test:进入分支【4】");
-			service.send_to_socket(ap);
+			service.send_to_socket(session,ap);
 		} else if (swt >= 128) { // 功能5：数据包不做处理直接发给手机
 			logger.debug("test:进入分支【5】");
 			service.send_to_mobile(ap);

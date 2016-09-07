@@ -13,6 +13,7 @@ import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoService;
 import org.apache.mina.core.session.IoSession;
 
+import com.bupt.dao.DBDaoImpl;
 import com.bupt.entity.AcessPoint;
 import com.bupt.entity.Record;
 import com.bupt.utils.Helper;
@@ -36,6 +37,8 @@ public class RequestService {
 	// 标志
 	private static final int NO_SOCKET_ADDR = 4;
 	private static final int NO_ERROR = 0;
+	private static final int NO_PERMISSION= 5;
+	private static final int MSG_ERROR_STATUS = 128; //在wifi_socket_server.h里
 
 	/**
 	 * 写入数据库(从收到的包中解析出wifi_id,wifi_ipv4,wifi_ipv4_port) 写两张表 record 和
@@ -45,7 +48,7 @@ public class RequestService {
 
 		Record record = new Record();
 		record.setWifi_id(ap.getWifi_id());
-		record.setWifi_ipv4(Integer.parseInt(ap.getIp()));
+		record.setWifi_ipv4(ap.getIp());
 		record.setWifi_ipv4_port(ap.getPort());
 		// step1:写heartnumber表
 		service.writeToHeartNumber(ap.getWifi_id());
@@ -59,13 +62,33 @@ public class RequestService {
 	/**
 	 * 发往插座(从数据库中提取出wifi_ipv4,wifi_ipv4_port填充到数据包中)
 	 */
-	public void send_to_socket(AcessPoint ap) {
+	public void send_to_socket(IoSession session,AcessPoint ap) {
+		
+		char[] tel_buf = new char[37];	// 发送给手机的响应信息
+		char[] newbuf = ap.getRecv();	//发送给插座的信息
+		
+		tel_buf[0] = MSG_ERROR_STATUS;
+		// 设置tel_buf中的macid
+		for(int i=MAC_OFFSET;i<MAC_OFFSET+6;i++){
+			tel_buf[i] = ap.getRecv()[i];
+		}
+		
+		
+		
 
 		// step1:在record表中查询wifi_ipv4,wifi_ipv4_port
-
+//		Record record = DBDaoImpl.getInfoFromRecord(ap);
+//		if(!record.isRecorded()){
+//			// 如果不存在记录，向手机发送错误响应消息
+//			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR;
+//			send(session, tel_buf);
+//		}
+		logger.debug("查完了");
 		// step2:根据查出ip 端口号，向其发送信息，测试是否在线
-
-		// step3:向手机发送响应信息
+		
+		// step3:向手机发送正确响应信息
+		tel_buf[PARA_OFFSET] = NO_ERROR;
+		send(session,tel_buf);
 
 	}
 
@@ -117,16 +140,54 @@ public class RequestService {
 	}
 
 	/**
-	 * 
+	 * 接收来自外部设备的请求信息
+	 * @param session	与外部设备的会话	
+	 * @param ap	外部设备实体类
 	 */
-	public void outside_send_to_socket(AcessPoint ap) {
+	public void outside_send_to_socket(IoSession session,AcessPoint ap) {
+		char[] tel_buf = new char[37];//向手机返回的信息
+		char[] newbuf = new char[37];//向wifi发送的信息（长度不对）
+		tel_buf[0] = MSG_ERROR_STATUS;
+		tel_buf[PARA_OFFSET] = NO_ERROR;
 		StringBuffer sb = new StringBuffer();
+		// 得到wifi_id
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
 			sb.append(ap.getRecv()[i]);
 		}
 		String mac_id = new String(sb);
 		System.out.println("mac_id is:" + mac_id);
+		// 得到com_id
+		sb = new StringBuffer();
+		for(int i = COMID_OFFSET;i<COMID_OFFSET+8;i++){
+			sb.append(ap.getRecv()[i]);
+		}
+		String com_id = new String(sb);
+		System.out.println("com_id is:" + com_id);
+		
+		
 		// 跟sent_to_socket差不多
+		// step1:先在record表中查找记录
+		Record record = DBDaoImpl.getInfoFromRecord(ap);
+		if(!record.isRecorded()){
+			// 设置未查到信息
+			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR;
+		}
+		
+		
+		// step2:在comsocket表里查询是否存在此comid的记录
+		boolean hasPermission = DBDaoImpl.hasItemInComsocket(mac_id, com_id);
+		if(!hasPermission){
+			//设置授权信息
+			tel_buf[PARA_OFFSET] = NO_PERMISSION;
+		}
+		
+		// 如果step1，step2 任一一步不存在，就向手机返回信息
+		if(tel_buf[PARA_OFFSET]!=NO_ERROR){
+			send(session, tel_buf);
+			return;
+		}
+		// step3:向wifi发信息
+		
 	}
 
 	/**

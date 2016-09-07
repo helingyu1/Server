@@ -57,15 +57,47 @@ public class Helper {
 
 		return cb.array();
 	}
-	public static String[] char2StringArray(char[] ch){
+
+	public static String[] char2StringArray(char[] ch) {
 		String[] rtn = new String[ch.length];
-		for(int i=0;i<rtn.length;i++)
-			rtn[i] = fill(Integer.toHexString((int)ch[i]),2,'0');
+		for (int i = 0; i < rtn.length; i++)
+			rtn[i] = fill(Integer.toHexString((int) ch[i]), 2, '0');
 		return rtn;
 	}
 
+	public static long ipToLong(String strip)
+	// 将127.0.0.1形式的ip地址转换成10进制整数，这里没有进行任何错误处理
+	{
+		long[] ip = new long[4];
+		int position1 = strip.indexOf(".");
+		int position2 = strip.indexOf(".", position1 + 1);
+		int position3 = strip.indexOf(".", position2 + 1);
+		ip[0] = Long.parseLong(strip.substring(0, position1));
+		ip[1] = Long.parseLong(strip.substring(position1 + 1, position2));
+		ip[2] = Long.parseLong(strip.substring(position2 + 1, position3));
+		ip[3] = Long.parseLong(strip.substring(position3 + 1));
+		return (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];// ip1*256*256*256+ip2*256*256+ip3*256+ip4
+	}
+
+	public static String longToIp(long longIp)
+	// 将10进制整数形式转换成127.0.0.1形式的ip地址，在命令提示符下输入ping3396362403l
+	{
+		StringBuffer sb = new StringBuffer("");
+		sb.append(String.valueOf(longIp >>> 24));// 直接右移24位
+		sb.append(".");
+		sb.append(String.valueOf((longIp & 0x00ffffff) >>> 16));// 将高8位置0，然后右移16位
+		sb.append(".");
+		sb.append(String.valueOf((longIp & 0x0000ffff) >>> 8));
+		sb.append(".");
+		sb.append(String.valueOf(longIp & 0x000000ff));
+//		sb.append(".");
+		return sb.toString();
+	}
+
 	public static void main(String[] args) {
-		System.out.println(fill("abc", 4, '0'));
+		// System.out.println(fill("abc", 4, '0'));
+//		System.out.println(longToIp(ipToLong("127.1.0.1")));
+		System.out.println(longToIp(348704058L));
 	}
 
 }

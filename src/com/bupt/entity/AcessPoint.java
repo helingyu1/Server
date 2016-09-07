@@ -9,20 +9,20 @@ import java.util.Arrays;
  */
 
 public class AcessPoint {
-	private String ip;
+	private long ip;
 	private int port;
 	private String wifi_id;
 	private char[] recv;
-	public AcessPoint(String ip,int port,String wifi_id,char[] recv){
+	public AcessPoint(long ip,int port,String wifi_id,char[] recv){
 		this.ip = ip;
 		this.port = port;
 		this.wifi_id = wifi_id;
 		this.recv = recv;
 	}
-	public String getIp() {
+	public long getIp() {
 		return ip;
 	}
-	public void setIp(String ip) {
+	public void setIp(long ip) {
 		this.ip = ip;
 	}
 	public int getPort() {
@@ -44,6 +44,7 @@ public class AcessPoint {
 	public void setWifi_id(String wifi_id) {
 		this.wifi_id = wifi_id;
 	}
+	
 	@Override
 	public String toString() {
 		return "AcessPoint [ip=" + ip + ", port=" + port + ", wifi_id="

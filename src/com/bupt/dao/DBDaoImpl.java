@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
 import com.bupt.connection.ConnectionPool;
+import com.bupt.entity.AcessPoint;
 import com.bupt.entity.Record;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
@@ -28,43 +29,56 @@ public class DBDaoImpl {
 
 	public static void replaceToRecord(Record record) {
 		String sql = "replace into record(wifi_ipv4,wifi_ipv4_port,time,wifi_id) values(?,?,?,?)";
+		Connection conn = null;
 		try {
-			Connection conn = (Connection) connPool.getConnection();
+			conn = (Connection) connPool.getConnection();
 			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
-			ps.setInt(1, record.getWifi_ipv4());
+			ps.setLong(1, record.getWifi_ipv4());
 			ps.setInt(2, record.getWifi_ipv4_port());
 			ps.setLong(3, System.currentTimeMillis()/1000);
 			ps.setString(4, record.getWifi_id());
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
 		
 	}
 
-	public static void getInfoFromRecord(String wifi_id) {
+	public static Record getInfoFromRecord(AcessPoint ap) {
+		Record record = new Record();
+		record.setWifi_id(ap.getWifi_id());
+		Connection conn = null;
 		try {
-			String sql = "select wifi_ipv4,wifi_ipv4_port from record where wifi_id="
-					+ "' 02 05 9a 07 86 b'";
-			// String sql =
-			// "select wifi_ipv4,wifi_ipv4_port from record where wifi_id=?";
-			Connection conn = (Connection) connPool.getConnection();
+			String sql = "select wifi_ipv4,wifi_ipv4_port from record where wifi_id='"
+					+ ap.getWifi_id()+"'";
+			conn = (Connection) connPool.getConnection();
 			PreparedStatement ps = (PreparedStatement) conn
 					.prepareStatement(sql);
-			// ps.setString(1, " 02059a0786b");
-			// ps.setBytes(1, " 02059a0786b".getBytes());
 
 			ResultSet rs = ps.executeQuery(sql);
 
-			rs.next();
-			long wifi_ipv4 = rs.getLong("wifi_ipv4");
-			long wifi_ipv4_port = rs.getLong("wifi_ipv4_port");
-			System.out.println(wifi_ipv4);
-			System.out.println(wifi_ipv4_port);
+			if(rs.next())
+			{
+				//如果存在记录
+				record.setRecorded(true);
+				record.setWifi_ipv4(rs.getInt("wifi_ipv4"));
+				record.setWifi_ipv4_port(rs.getInt("wifi_ipv4_port"));
+				long wifi_ipv4 = rs.getLong("wifi_ipv4");
+				long wifi_ipv4_port = rs.getLong("wifi_ipv4_port");
+				System.out.println(wifi_ipv4);
+				System.out.println(wifi_ipv4_port);
+			}else{
+				record.setRecorded(false);
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
+		return record;
 	}
 
 	/**
@@ -76,14 +90,16 @@ public class DBDaoImpl {
 		String time_day = getCurrentDateString();
 		String sql = "insert into heartnumber(wifi_id,time_day,heart_num) values('"
 				+ wifi_id + "','" + time_day + "',1)";
-
+		Connection conn = null;
 		try {
-			Connection conn = (Connection) connPool.getConnection();
+			conn = (Connection) connPool.getConnection();
 			PreparedStatement ps = (PreparedStatement) conn
 					.prepareStatement(sql);
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
 	}
 
@@ -95,8 +111,9 @@ public class DBDaoImpl {
 	 */
 	public static boolean hasItemInHeartdevice(String wifi_id) {
 		boolean ret = false;
+		Connection conn = null;
 		try {
-			Connection conn = (Connection) connPool.getConnection();
+			conn = (Connection) connPool.getConnection();
 			String sql = "select * from heartdevice where wifi_id='" + wifi_id
 					+ "'";
 			PreparedStatement ps = (PreparedStatement) conn
@@ -107,6 +124,8 @@ public class DBDaoImpl {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
 		return ret;
 	}
@@ -120,8 +139,9 @@ public class DBDaoImpl {
 	public static boolean hasItemInHeartnumber(String wifi_id) {
 		boolean ret = false;
 		String time_day = getCurrentDateString();
+		Connection conn = null;
 		try {
-			Connection conn = (Connection) connPool.getConnection();
+			conn = (Connection) connPool.getConnection();
 			String sql = "select * from heartnumber where wifi_id='" + wifi_id
 					+ "' and time_day='" + time_day + "'";
 			PreparedStatement ps = (PreparedStatement) conn
@@ -132,6 +152,8 @@ public class DBDaoImpl {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
 		return ret;
 	}
@@ -145,14 +167,43 @@ public class DBDaoImpl {
 		String time_day = getCurrentDateString();
 		String sql = "update heartnumber set heart_num=heart_num+1 where wifi_id='"
 				+ wifi_id + "' and time_day='" + time_day + "'";
+		Connection conn = null;
 		try {
-			Connection conn = (Connection) connPool.getConnection();
+			conn = (Connection) connPool.getConnection();
 			PreparedStatement ps = (PreparedStatement) conn
 					.prepareStatement(sql);
 			ps.execute();
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
 		}
+	}
+	
+	/**
+	 * 查询在comsocket中是否存在记录
+	 * @param wifi_id
+	 * @param com_id
+	 * @return
+	 */
+	public static boolean hasItemInComsocket(String wifi_id,String com_id){
+		boolean ret = false;
+		String sql = "select com_id from comsocket where wifi_id=? and com_id=?";
+		Connection conn = null;
+		try {
+			conn = (Connection) connPool.getConnection();
+			PreparedStatement ps = (PreparedStatement) conn.prepareStatement(sql);
+			ps.setString(1, wifi_id);
+			ps.setString(2, com_id);
+			ResultSet rs = (ResultSet)ps.executeQuery();
+			if(rs.next())
+				ret = true;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally{
+			connPool.returnConnection(conn);
+		}
+		return ret;
 	}
 
 	public static String getCurrentDateString() {
