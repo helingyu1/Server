@@ -6,6 +6,7 @@ import java.net.SocketAddress;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.ReadFuture;
 import org.apache.mina.core.future.WriteFuture;
@@ -23,6 +24,7 @@ import com.bupt.utils.Helper;
  * 
  */
 public class RequestService {
+	private final Logger logger = Logger.getLogger(RequestService.class);
 	private DaoService service = new DaoService();
 
 	// 数据偏移量
@@ -104,19 +106,11 @@ public class RequestService {
 		rtn[10] = (char) (Integer.parseInt(hour, 16));
 		rtn[11] = (char) (Integer.parseInt(min, 16));
 		rtn[12] = (char) Integer.parseInt(sec, 16);
-		System.out.println(Arrays.toString(Helper.char2StringArray(rtn)));
+//		System.out.println(Arrays.toString(Helper.char2StringArray(rtn)));
 		WriteFuture writeFuture = send(session, rtn);
 		if (writeFuture.isWritten()) {
-			System.out.println("heartbeat reply  success!");
-			// ReadFuture readFuture = session.read();
-			// readFuture.awaitUninterruptibly();
-			// if(readFuture.isRead()){
-			// System.out.println("???????????");
-			// Object message = readFuture.getMessage();
-			// IoBuffer buffer = (IoBuffer)message;
-			// char recv[] = Helper.getChars(buffer.array());
-			// System.out.println("服务器再次收到的消息："+Helper.char2StringArray(recv));
-			// }
+			logger.debug("heartbeat reply  success!");
+			
 		}
 		// 若收到的消息 recv_buf[18]==0x5f && recv_buf[19]==0x3f :heartbeat reply
 		// success!

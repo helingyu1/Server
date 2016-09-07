@@ -3,6 +3,7 @@ package com.bupt.minaserver;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.session.ExpiringSessionRecycler;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -11,6 +12,8 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
 public class MinaServer {
+	
+	private static final Logger logger = Logger.getLogger(MinaServer.class);
 
 	/**
 	 * @param args
@@ -30,15 +33,15 @@ public class MinaServer {
 		DatagramSessionConfig dcfg = acceptor.getSessionConfig();
 		dcfg.setReuseAddress(true);
 		// 设置输入缓冲区的大小，压力测试表明：调整到2048后性能反而降低
-		dcfg.setReceiveBufferSize(1024);
+		dcfg.setReceiveBufferSize(2048);
 		// 设置输出缓冲区的大小，压力测试表明：调整到2048后性能反而降低
-		dcfg.setSendBufferSize(1024);
+		dcfg.setSendBufferSize(2048);
 		
 		dcfg.setUseReadOperation(true);
 
 		// ** UDP服务端开始侦听
 		acceptor.bind(new InetSocketAddress(9999));
-		System.out.println("开始监听");
+		logger.debug("服务器开始监听");
 	}
 
 }

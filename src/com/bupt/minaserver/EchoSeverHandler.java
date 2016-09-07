@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
@@ -21,6 +22,8 @@ import com.bupt.utils.Helper;
  *
  */
 public class EchoSeverHandler extends IoHandlerAdapter {
+	
+	private final Logger logger = Logger.getLogger(EchoSeverHandler.class);
 	// service
 	RequestService service = new RequestService();
 
@@ -78,16 +81,15 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			throws Exception {
 		// *********************************************** 接收数据
 		// step1:读取收到的数据
-		System.out.println(message);
+//		System.out.println(message);
 		IoBuffer buffer = (IoBuffer) message;	
 		// 接收到的byte数组
 		byte[] recv_b = buffer.array();
-		int size = buffer.limit();
-		System.out.println("size:"+size);
+//		int size = buffer.limit();
 		
 		// 转成字符数组
 		char[] recv = Helper.getChars(recv_b);
-		System.out.println("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
+		logger.debug("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
 		// 得到wifi_id
 		StringBuffer sb = new StringBuffer();
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
@@ -100,22 +102,21 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		System.out.println(ap);
 
 		// step2:解析数据
-//		int swt = Integer.parseInt(recv[0], 16);
 		int swt = recv[0];
 		if (swt == 0) { // 功能1：写插座信息到数据库
-			System.out.println("test:进入分支【1】");
+			logger.debug("test:进入分支【1】");
 			service.store_to_database(session,ap);
 		} else if (swt == 99) { // 功能2：检测服务器是否在线
-			System.out.println("test:进入分支【2】");
+			logger.debug("test:进入分支【2】");
 			service.detect_alive(session,ap);
 		} else if (swt > 100 && swt < 128) { // 功能3：第三方发送控制命令到服务器
-			System.out.println("test:进入分支【3】");
+			logger.debug("test:进入分支【3】");
 			service.outside_send_to_socket(ap);
 		} else if (swt >= 1 && swt < 128) { // 功能4：查看多个插座是否在线
-			System.out.println("test:进入分支【4】");
+			logger.debug("test:进入分支【4】");
 			service.send_to_socket(ap);
 		} else if (swt >= 128) { // 功能5：数据包不做处理直接发给手机
-			System.out.println("test:进入分支【5】");
+			logger.debug("test:进入分支【5】");
 			service.send_to_mobile(ap);
 		}
 	}
