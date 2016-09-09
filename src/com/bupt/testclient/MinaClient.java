@@ -12,7 +12,7 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramConnector;
   
 /** 
- * Æô¶¯¿Í»§¶Ë 
+ * ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ 
  * @author 
  * 
  */  
@@ -24,19 +24,19 @@ public class MinaClient {
         //NioSocketConnector connector = new NioSocketConnector();  
         NioDatagramConnector connector = new NioDatagramConnector();
           
-        //´´½¨½ÓÊÜÊý¾ÝµÄ¹ýÂËÆ÷  
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÝµÄ¹ï¿½ï¿½ï¿½ï¿½ï¿½  
         DefaultIoFilterChainBuilder chain = connector.getFilterChain();  
           
-        //Éè¶¨Õâ¸ö¹ýÂËÆ÷½«Ò»ÐÐÒ»ÐÐ(/r/n)µÄ¶ÁÈ¡Êý¾Ý  
+        //ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ò»ï¿½ï¿½(/r/n)ï¿½Ä¶ï¿½È¡ï¿½ï¿½ï¿½  
 //        chain.addLast("myChin", new ProtocolCodecFilter(new TextLineCodecFactory()));  
           
-        //·þÎñÆ÷µÄÏûÏ¢´¦ÀíÆ÷£ºÒ»¸öSamplMinaServerHander¶ÔÏó  
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½SamplMinaServerHanderï¿½ï¿½ï¿½ï¿½  
         connector.setHandler(new SamplMinaClientHander());  
           
         //set connect timeout  
         connector.setConnectTimeout(30);  
-        //Á¬½Óµ½·þÎñÆ÷£º  
-        ConnectFuture cf = connector.connect(new InetSocketAddress("localhost",12345));  
+        //ï¿½ï¿½ï¿½Óµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  
+        ConnectFuture cf = connector.connect(new InetSocketAddress("192.168.0.8",9999));
           
         //Wait for the connection attempt to be finished.  
         cf.awaitUninterruptibly();  
@@ -44,7 +44,7 @@ public class MinaClient {
         cf.getSession().getCloseFuture().awaitUninterruptibly(); 
         
         IoSession session = cf.getSession();
-        byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+        byte[] aa = {0x22,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
         session.write(aa);
           
         connector.dispose();  

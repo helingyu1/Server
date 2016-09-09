@@ -6,8 +6,8 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;  
   
 /** 
- * ÏûÏ¢´¦ÀíÀà 
- * @author ºÎÃ÷ 
+ * ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+ * @author ï¿½ï¿½ï¿½ï¿½ 
  * 
  */  
 public class SamplMinaClientHander extends IoHandlerAdapter {  
@@ -20,18 +20,18 @@ public class SamplMinaClientHander extends IoHandlerAdapter {
     }  
   
     /** 
-     * µ±¿Í»§¶Ë½ÓÊÜµ½ÏûÏ¢Ê± 
+     * ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë½ï¿½ï¿½Üµï¿½ï¿½ï¿½Ï¢Ê± 
      */  
     @Override  
     public void messageReceived(IoSession session, Object message) throws Exception {  
   
-        //ÎÒÃÇÒÑÉè¶¨ÁË·þÎñÆ÷µÄÏûÏ¢¹æÔòÊÇÒ»ÐÐÒ»ÐÐ¶ÁÈ¡£¬ÕâÀï¾Í¿ÉÒÔ×ªÎªString:  
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ò»ï¿½Ð¶ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½×ªÎªString:  
         String s = (String)message;  
           
         //Writer the received data back to remote peer  
-        System.out.println("·þÎñÆ÷·¢À´µÄÊÕµ½ÏûÏ¢: " + s);  
+        System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½Ï¢: " + s);  
           
-        //²âÊÔ½«ÏûÏ¢»ØËÍ¸ø¿Í»§¶Ë  
+        //ï¿½ï¿½ï¿½Ô½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Í¸ï¿½Í»ï¿½ï¿½ï¿½  
         session.write(s);  
   
     }  
@@ -43,7 +43,7 @@ public class SamplMinaClientHander extends IoHandlerAdapter {
     }  
   
     /** 
-     * µ±Ò»¸ö¿Í»§¶Ë±»¹Ø±ÕÊ± 
+     * ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë±ï¿½ï¿½Ø±ï¿½Ê± 
      */  
     @Override  
     public void sessionClosed(IoSession session) throws Exception {  
@@ -65,17 +65,17 @@ public class SamplMinaClientHander extends IoHandlerAdapter {
     }  
   
     /** 
-     * µ±Ò»¸ö¿Í»§¶ËÁ¬½Ó½øÈëÊ± 
+     * ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½Ê± 
      */  
     @Override  
     public void sessionOpened(IoSession session) throws Exception {  
   
         System.out.println("incomming client:" + session.getRemoteAddress()); 
-        byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+        byte[] aa = {0x64,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
         IoBuffer buffer = IoBuffer.wrap(aa);
-        session.write(buffer);  
-  
+        session.write(buffer);
+
     }  
   
 }  

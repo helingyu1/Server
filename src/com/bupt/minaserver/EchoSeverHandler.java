@@ -16,8 +16,8 @@ import com.bupt.service.RequestService;
 import com.bupt.utils.Helper;
 
 /**
- * ¸ÃÀà½ÓÊÕ²¢´¦Àí²»Í¬ÀàÐÍµÄÏûÏ¢
- * ·¢ËÍ½ÓÊÕÓÃbyte[],×ª³Échar[]À´²Ù×÷
+ * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ²ï¿½ï¿½ï¿½ï¿½?Í¬ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ï¢
+ * ï¿½ï¿½ï¿½Í½ï¿½ï¿½ï¿½ï¿½ï¿½byte[],×ªï¿½ï¿½char[]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  * @author helingyu
  *
  */
@@ -28,12 +28,12 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 	// service
 	RequestService service = new RequestService();
 
-	// Êý¾ÝÆ«ÒÆÁ¿
+	// ï¿½ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½
 	private static final int MAC_OFFSET = 14;
-	private static final int ACTION_OFFSET = 36;// outside·½·¨ÀïÓÃ
+	private static final int ACTION_OFFSET = 36;// outsideï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private static final int PARA_OFFSET = 20;
 
-	// ±êÖ¾
+	// ï¿½ï¿½Ö¾
 	private static final int NO_SOCKET_ADDR = 4;
 	private static final int NO_ERROR = 0;
 
@@ -41,47 +41,47 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			.newDecoder();
 
 	/**
-	 * MINAµÄÒì³£»Øµ÷·½·¨¡£
+	 * MINAï¿½ï¿½ï¿½ì³£ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 * <p>
-	 * ±¾ÀàÖÐ½«ÔÚÒì³£·¢ÉúÊ±£¬Á¢¼´closeµ±Ç°»á»°¡£
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½ï¿½ï¿½ï¿½ì³£ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½closeï¿½ï¿½Ç°ï¿½á»°ï¿½ï¿½
 	 * 
 	 * @param session
-	 *            ·¢ÉúÒì³£µÄ»á»°
+	 *            ï¿½ï¿½ï¿½ï¿½ï¿½ì³£ï¿½Ä»á»°
 	 * @param cause
-	 *            Òì³£ÄÚÈÝ
+	 *            ï¿½ì³£ï¿½ï¿½ï¿½ï¿½
 	 * @see IoSession#close(boolean)
 	 */
 	@Override
 	public void exceptionCaught(IoSession session, Throwable cause)
 			throws Exception {
-		// logger.error("[IMCORE]exceptionCaught²¶»ñµ½´íÁË£¬Ô­ÒòÊÇ£º" +
+		// logger.error("[IMCORE]exceptionCaughtï¿½ï¿½ï¿½ñµ½´ï¿½ï¿½Ë£ï¿½Ô­ï¿½ï¿½ï¿½Ç£ï¿½" +
 		// cause.getMessage(),
 		// cause);
 		session.close(true);
 	}
 
 	/**
-	 * MINA¿ò¼ÜÖÐÊÕµ½¿Í»§¶ËÏûÏ¢µÄ»Øµ÷·½·¨¡£
+	 * MINAï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 * <p>
-	 * ±¾Àà½«ÔÚ´Ë·½·¨ÖÐÊµÏÖÍêÕûµÄ¼´Ê±Í¨Ñ¶Êý¾Ý½»»¥ºÍ´¦Àí²ßÂÔ¡£
+	 * ï¿½ï¿½ï¿½à½«ï¿½Ú´Ë·ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½Ê±Í¨Ñ¶ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½Ô¡ï¿½
 	 * <p>
-	 * ÎªÁËÌáÉý²¢·¢ÐÔÄÜ£¬±¾·½·¨½«ÔËÐÐÔÚ¶ÀÁ¢ÓÚMINAµÄIoProcessorÖ®ÍâµÄÏß³Ì³ØÖÐ£¬ Ïê¼û
-	 * {@link ServerLauncher#initAcceptor()}ÖÐµÄMINAÉèÖÃ´úÂë ¡£
+	 * Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½MINAï¿½ï¿½IoProcessorÖ®ï¿½ï¿½ï¿½ï¿½ß³Ì³ï¿½ï¿½Ð£ï¿½ ï¿½ï¿½ï¿½
+	 * {@link ServerLauncher#initAcceptor()}ï¿½Ðµï¿½MINAï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ ï¿½ï¿½
 	 * 
 	 * @param session
-	 *            ÊÕµ½ÏûÏ¢¶ÔÓ¦µÄ»á»°ÒýÓÃ
+	 *            ï¿½Õµï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ó¦ï¿½Ä»á»°ï¿½ï¿½ï¿½ï¿½
 	 * @param message
-	 *            ÊÕµ½µÄMINAµÄÔ­Ê¼ÏûÏ¢·â×°¶ÔÏó£¬±¾ÀàÖÐÊÇ {@link IoBuffer}¶ÔÏó
+	 *            ï¿½Õµï¿½ï¿½ï¿½MINAï¿½ï¿½Ô­Ê¼ï¿½ï¿½Ï¢ï¿½ï¿½×°ï¿½ï¿½ï¿½ó£¬±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ {@link IoBuffer}ï¿½ï¿½ï¿½ï¿½
 	 * @throws Exception
-	 *             µ±ÓÐ´íÎó·¢ÉúÊ±½«Å×³öÒì³£
+	 *             ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½×³ï¿½ï¿½ì³£
 	 * 
-	 *             ps:½ÓÊÕÀ´×Ôwifi socket»òÕßmobileµÄÏûÏ¢
+	 *             ps:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½wifi socketï¿½ï¿½ï¿½ï¿½mobileï¿½ï¿½ï¿½ï¿½Ï¢
 	 */
 	@Override
 	public void messageReceived(IoSession session, Object message)
 			throws Exception {
-		// *********************************************** ½ÓÊÕÊý¾Ý
-		// step1:¶ÁÈ¡ÊÕµ½µÄÊý¾Ý
+		// *********************************************** ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// step1:ï¿½ï¿½È¡ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //		System.out.println(message);
 		IoBuffer buffer = (IoBuffer) message;
 		String hex = buffer.getHexDump();
@@ -90,15 +90,15 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		System.out.println(Arrays.toString(recv));
 //		System.out.println("test :::::"+Arrays.toString(buffer.asCharBuffer().array()));;
 //		System.out.println((String)message);
-		// ½ÓÊÕµ½µÄbyteÊý×é
+		// ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½byteï¿½ï¿½ï¿½ï¿½
 		byte[] recv_b = buffer.array();
 		
-		// ×ª³É×Ö·ûÊý×é
+		// ×ªï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
 //		char[] recv = Helper.getChars(recv_b);
-//		logger.debug("·þÎñÆ÷½ÓÊÕµ½µÄÊý¾Ý£º"+Arrays.toString(Helper.char2StringArray(recv)));
-		logger.debug("·þÎñÆ÷½ÓÊÕµ½µÄÊý¾Ý£º"+Arrays.toString(recv));
+//		logger.debug("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½"+Arrays.toString(Helper.char2StringArray(recv)));
+		logger.debug("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½"+Arrays.toString(recv));
 
-		// µÃµ½wifi_id
+		// ï¿½Ãµï¿½wifi_id
 		StringBuffer sb = new StringBuffer();
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
 //			sb.append(Helper.char2StringArray(recv)[i]);
@@ -114,23 +114,23 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 				addr.getPort(), mac_id,recv);
 //		System.out.println(ap);
 
-		// step2:½âÎöÊý¾Ý
+		// step2:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		int swt = Integer.parseInt(recv[0],16);
 		logger.debug("swt:"+swt);
-		if (swt == 0) { // ¹¦ÄÜ1£ºÐ´²å×ùÐÅÏ¢µ½Êý¾Ý¿â
-			logger.debug("test:½øÈë·ÖÖ§¡¾1¡¿");
+		if (swt == 0) { // ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½Ý¿ï¿½
+			logger.debug("test:ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½1ï¿½ï¿½");
 			service.store_to_database(session,ap);
-		} else if (swt == 99) { // ¹¦ÄÜ2£º¼ì²â·þÎñÆ÷ÊÇ·ñÔÚÏß
-			logger.debug("test:½øÈë·ÖÖ§¡¾2¡¿");
+		} else if (swt == 99) { // ï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+			logger.debug("test:ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½2ï¿½ï¿½");
 			service.detect_alive(session,ap);
-		} else if (swt > 100 && swt < 128) { // ¹¦ÄÜ3£ºµÚÈý·½·¢ËÍ¿ØÖÆÃüÁîµ½·þÎñÆ÷
-			logger.debug("test:½øÈë·ÖÖ§¡¾3¡¿");
+		} else if (swt > 100 && swt < 128) { // ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½îµ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			logger.debug("test:ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½3ï¿½ï¿½");
 			service.outside_send_to_socket(session,ap);
-		} else if (swt >= 1 && swt < 128) { // ¹¦ÄÜ4£º²é¿´¶à¸ö²å×ùÊÇ·ñÔÚÏß
-//			logger.debug("test:½øÈë·ÖÖ§¡¾4¡¿");
+		} else if (swt >= 1 && swt < 128) { // ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½é¿´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
+//			logger.debug("test:ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½4ï¿½ï¿½");
 			service.send_to_socket(session,ap);
-		} else if (swt >= 128) { // ¹¦ÄÜ5£ºÊý¾Ý°ü²»×ö´¦ÀíÖ±½Ó·¢¸øÊÖ»ú
-			logger.debug("test:½øÈë·ÖÖ§¡¾5¡¿");
+		} else if (swt >= 128) { // ï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½Ý°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½Ó·ï¿½ï¿½ï¿½ï¿½Ö»ï¿½
+			logger.debug("test:ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½5ï¿½ï¿½");
 			service.send_to_mobile(ap);
 		}
 	}
