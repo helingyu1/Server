@@ -12,8 +12,8 @@ public class AcessPoint {
 	private long ip;
 	private int port;
 	private String wifi_id;
-	private char[] recv;
-	public AcessPoint(long ip,int port,String wifi_id,char[] recv){
+	private String[] recv;
+	public AcessPoint(long ip,int port,String wifi_id,String[] recv){
 		this.ip = ip;
 		this.port = port;
 		this.wifi_id = wifi_id;
@@ -31,10 +31,10 @@ public class AcessPoint {
 	public void setPort(int port) {
 		this.port = port;
 	}
-	public char[] getRecv() {
+	public String[] getRecv() {
 		return recv;
 	}
-	public void setRecv(char[] recv) {
+	public void setRecv(String[] recv) {
 		this.recv = recv;
 	}
 	

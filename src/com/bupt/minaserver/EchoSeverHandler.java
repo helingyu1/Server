@@ -22,6 +22,7 @@ import com.bupt.utils.Helper;
  *
  */
 public class EchoSeverHandler extends IoHandlerAdapter {
+	static int sum = 0;
 	
 	private final Logger logger = Logger.getLogger(EchoSeverHandler.class);
 	// service
@@ -82,18 +83,26 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 		// *********************************************** 接收数据
 		// step1:读取收到的数据
 //		System.out.println(message);
-		IoBuffer buffer = (IoBuffer) message;	
+		IoBuffer buffer = (IoBuffer) message;
+		String hex = buffer.getHexDump();
+		System.out.println("hex:"+hex);
+		String[] recv = hex.split(" ");
+		System.out.println(Arrays.toString(recv));
+//		System.out.println("test :::::"+Arrays.toString(buffer.asCharBuffer().array()));;
+//		System.out.println((String)message);
 		// 接收到的byte数组
 		byte[] recv_b = buffer.array();
-//		int size = buffer.limit();
 		
 		// 转成字符数组
-		char[] recv = Helper.getChars(recv_b);
+//		char[] recv = Helper.getChars(recv_b);
 //		logger.debug("服务器接收到的数据："+Arrays.toString(Helper.char2StringArray(recv)));
+		logger.debug("服务器接收到的数据："+Arrays.toString(recv));
+
 		// 得到wifi_id
 		StringBuffer sb = new StringBuffer();
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
-			sb.append(Helper.char2StringArray(recv)[i]);
+//			sb.append(Helper.char2StringArray(recv)[i]);
+			sb.append(recv[i]);
 		}
 		String mac_id = new String(sb);
 		InetSocketAddress addr = (InetSocketAddress) session.getRemoteAddress();
@@ -106,7 +115,8 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 //		System.out.println(ap);
 
 		// step2:解析数据
-		int swt = recv[0];
+		int swt = Integer.parseInt(recv[0],16);
+		logger.debug("swt:"+swt);
 		if (swt == 0) { // 功能1：写插座信息到数据库
 			logger.debug("test:进入分支【1】");
 			service.store_to_database(session,ap);
@@ -117,7 +127,7 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 			logger.debug("test:进入分支【3】");
 			service.outside_send_to_socket(session,ap);
 		} else if (swt >= 1 && swt < 128) { // 功能4：查看多个插座是否在线
-			logger.debug("test:进入分支【4】");
+//			logger.debug("test:进入分支【4】");
 			service.send_to_socket(session,ap);
 		} else if (swt >= 128) { // 功能5：数据包不做处理直接发给手机
 			logger.debug("test:进入分支【5】");
@@ -126,6 +136,19 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 	}
 	
 
+	@Override
+	public void sessionCreated(IoSession session) throws Exception {
+		super.sessionCreated(session);
+//		System.out.println(((InetSocketAddress)session.getRemoteAddress()).getHostName());
+//		session.write("aaaa");
+	}
+
+	@Override
+	public void sessionOpened(IoSession session) throws Exception {
+		// TODO Auto-generated method stub
+		super.sessionOpened(session);
+	}
+
 	public static void main(String[] args) {
 
 //		String hex = "1111";
@@ -133,9 +156,10 @@ public class EchoSeverHandler extends IoHandlerAdapter {
 //		System.out.println(arr.length);
 //		for (int i = 0; i < arr.length; i++)
 //			System.out.println(arr[i]);
-		char[] aa = {0x63,0x63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
-		String b = new String(aa);
-		System.out.println(b);
+//		char[] aa = {0x63,0x63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x63};
+//		String b = new String(aa);
+//		System.out.println(b);
+		System.out.println(Integer.parseInt("ff", 16));
 
 
 	}

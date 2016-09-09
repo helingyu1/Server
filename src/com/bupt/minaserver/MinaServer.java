@@ -33,14 +33,15 @@ public class MinaServer {
 		DatagramSessionConfig dcfg = acceptor.getSessionConfig();
 		dcfg.setReuseAddress(true);
 		// 设置输入缓冲区的大小，压力测试表明：调整到2048后性能反而降低
-		dcfg.setReceiveBufferSize(2048);
+		dcfg.setReceiveBufferSize(1024);
 		// 设置输出缓冲区的大小，压力测试表明：调整到2048后性能反而降低
-		dcfg.setSendBufferSize(2048);
+		dcfg.setSendBufferSize(1024);
 		
 		dcfg.setUseReadOperation(true);
-
+		acceptor.setDefaultLocalAddress(new InetSocketAddress(12345));
+		acceptor.bind();
 		// ** UDP服务端开始侦听
-		acceptor.bind(new InetSocketAddress(9999));
+//		acceptor.bind(new InetSocketAddress(12345));
 		logger.debug("服务器开始监听");
 	}
 

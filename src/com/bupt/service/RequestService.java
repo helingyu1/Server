@@ -64,30 +64,29 @@ public class RequestService {
 	 */
 	public void send_to_socket(IoSession session,AcessPoint ap) {
 		
-		char[] tel_buf = new char[37];	// 发送给手机的响应信息
-		char[] newbuf = ap.getRecv();	//发送给插座的信息
+		String[] tel_buf = new String[37];	// 发送给手机的响应信息
+		String[] newbuf = ap.getRecv();	//发送给插座的信息
 		
-		tel_buf[0] = MSG_ERROR_STATUS;
+		tel_buf[0] = MSG_ERROR_STATUS+"";
 		// 设置tel_buf中的macid
 		for(int i=MAC_OFFSET;i<MAC_OFFSET+6;i++){
 			tel_buf[i] = ap.getRecv()[i];
 		}
-		
-		
-		
-
 		// step1:在record表中查询wifi_ipv4,wifi_ipv4_port
-//		Record record = DBDaoImpl.getInfoFromRecord(ap);
-//		if(!record.isRecorded()){
-//			// 如果不存在记录，向手机发送错误响应消息
-//			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR;
-//			send(session, tel_buf);
-//		}
+		Record record = DBDaoImpl.getInfoFromRecord(ap);
+//		logger.debug(record.isRecorded());
+		if(!record.isRecorded()){
+			logger.debug("查找失败");
+			// 如果不存在记录，向手机发送错误响应消息
+			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR+"";
+			send(session, tel_buf);
+			return;
+		}
 		logger.debug("查完了");
 		// step2:根据查出ip 端口号，向其发送信息，测试是否在线
 		
 		// step3:向手机发送正确响应信息
-		tel_buf[PARA_OFFSET] = NO_ERROR;
+		tel_buf[PARA_OFFSET] = NO_ERROR+"";
 		send(session,tel_buf);
 
 	}
@@ -103,9 +102,9 @@ public class RequestService {
 	 * 检测本服务器是否在线
 	 */
 	public void detect_alive(IoSession session, AcessPoint ap) {
-		char[] rtn = new char[20];
+		String[] rtn = new String[20];
 		for (int i = 0; i < rtn.length; i++)
-			rtn[i] = 0x00;
+			rtn[i] = "00";
 		// 收到请求，添加时间信息，返回
 		// 获取当前时间信息
 		Calendar cal = Calendar.getInstance();
@@ -121,14 +120,21 @@ public class RequestService {
 				2, '0');
 		String sec = Helper.fill(Integer.toHexString(cal.get(Calendar.SECOND)),
 				2, '0');
+		rtn[6] = year.substring(2, 4);// 年份低字节
+		rtn[7] = year.substring(0, 2);// 年份高字节
+		rtn[8] = month;
+		rtn[9] = day;
+		rtn[10] = hour;
+		rtn[11] = min;
+		rtn[12] = sec;
 
-		rtn[6] = (char) Integer.parseInt(year.substring(2, 4), 16);// 年份低字节
-		rtn[7] = (char) Integer.parseInt(year.substring(0, 2), 16);// 年份高字节
-		rtn[8] = (char) (Integer.parseInt(month, 16));
-		rtn[9] = (char) (Integer.parseInt(day, 16));
-		rtn[10] = (char) (Integer.parseInt(hour, 16));
-		rtn[11] = (char) (Integer.parseInt(min, 16));
-		rtn[12] = (char) Integer.parseInt(sec, 16);
+//		rtn[6] = (char) Integer.parseInt(year.substring(2, 4), 16);// 年份低字节
+//		rtn[7] = (char) Integer.parseInt(year.substring(0, 2), 16);// 年份高字节
+//		rtn[8] = (char) (Integer.parseInt(month, 16));
+//		rtn[9] = (char) (Integer.parseInt(day, 16));
+//		rtn[10] = (char) (Integer.parseInt(hour, 16));
+//		rtn[11] = (char) (Integer.parseInt(min, 16));
+//		rtn[12] = (char) Integer.parseInt(sec, 16);
 //		System.out.println(Arrays.toString(Helper.char2StringArray(rtn)));
 		WriteFuture writeFuture = send(session, rtn);
 		if (writeFuture.isWritten()) {
@@ -145,10 +151,10 @@ public class RequestService {
 	 * @param ap	外部设备实体类
 	 */
 	public void outside_send_to_socket(IoSession session,AcessPoint ap) {
-		char[] tel_buf = new char[37];//向手机返回的信息
+		String[] tel_buf = new String[37];//向手机返回的信息
 		char[] newbuf = new char[37];//向wifi发送的信息（长度不对）
-		tel_buf[0] = MSG_ERROR_STATUS;
-		tel_buf[PARA_OFFSET] = NO_ERROR;
+		tel_buf[0] = MSG_ERROR_STATUS+"";
+		tel_buf[PARA_OFFSET] = NO_ERROR+"";
 		StringBuffer sb = new StringBuffer();
 		// 得到wifi_id
 		for (int i = MAC_OFFSET; i < MAC_OFFSET + 6; i++) {
@@ -170,7 +176,7 @@ public class RequestService {
 		Record record = DBDaoImpl.getInfoFromRecord(ap);
 		if(!record.isRecorded()){
 			// 设置未查到信息
-			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR;
+			tel_buf[PARA_OFFSET] = NO_SOCKET_ADDR+"";
 		}
 		
 		
@@ -178,11 +184,11 @@ public class RequestService {
 		boolean hasPermission = DBDaoImpl.hasItemInComsocket(mac_id, com_id);
 		if(!hasPermission){
 			//设置授权信息
-			tel_buf[PARA_OFFSET] = NO_PERMISSION;
+			tel_buf[PARA_OFFSET] = NO_PERMISSION+"";
 		}
 		
 		// 如果step1，step2 任一一步不存在，就向手机返回信息
-		if(tel_buf[PARA_OFFSET]!=NO_ERROR){
+		if(!(NO_ERROR+"").equals(tel_buf[PARA_OFFSET])){
 			send(session, tel_buf);
 			return;
 		}
@@ -197,10 +203,14 @@ public class RequestService {
 	 * @param data
 	 * @return
 	 */
-	public WriteFuture send(IoSession session, char[] data) {
-		byte[] toSend = Helper.getBytes(data);
-		IoBuffer buffer = IoBuffer.wrap(toSend);
-		WriteFuture future = session.write(buffer);
+	public WriteFuture send(IoSession session, String[] data) {
+//		byte[] toSend = Helper.getBytes(data);
+//		IoBuffer buffer = IoBuffer.wrap(toSend);
+//		WriteFuture future = session.write(buffer);
+//		future.awaitUninterruptibly(100);
+//		return future;
+//		IoBuffer buffer = IoBuffer.wrap(data);
+		WriteFuture future = session.write(data);
 		future.awaitUninterruptibly(100);
 		return future;
 	}

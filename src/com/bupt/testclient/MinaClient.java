@@ -36,16 +36,16 @@ public class MinaClient {
         //set connect timeout  
         connector.setConnectTimeout(30);  
         //连接到服务器：  
-        ConnectFuture cf = connector.connect(new InetSocketAddress("localhost",9999));  
+        ConnectFuture cf = connector.connect(new InetSocketAddress("localhost",12345));  
           
         //Wait for the connection attempt to be finished.  
         cf.awaitUninterruptibly();  
           
         cf.getSession().getCloseFuture().awaitUninterruptibly(); 
         
-//        IoSession session = cf.getSession();
-//        byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-//        session.write(aa);
+        IoSession session = cf.getSession();
+        byte[] aa = {0x63,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+        session.write(aa);
           
         connector.dispose();  
     }  

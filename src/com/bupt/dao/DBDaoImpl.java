@@ -7,6 +7,8 @@ import java.util.Date;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
+import org.apache.log4j.Logger;
+
 import com.bupt.connection.ConnectionPool;
 import com.bupt.entity.AcessPoint;
 import com.bupt.entity.Record;
@@ -14,6 +16,8 @@ import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 
 public class DBDaoImpl {
+	
+	private static final Logger logger = Logger.getLogger(DBDaoImpl.class);
 
 	private static ConnectionPool connPool;
 
@@ -49,6 +53,7 @@ public class DBDaoImpl {
 	public static Record getInfoFromRecord(AcessPoint ap) {
 		Record record = new Record();
 		record.setWifi_id(ap.getWifi_id());
+		logger.debug("wifi_id="+ap.getWifi_id());
 		Connection conn = null;
 		try {
 			String sql = "select wifi_ipv4,wifi_ipv4_port from record where wifi_id='"
@@ -61,6 +66,7 @@ public class DBDaoImpl {
 
 			if(rs.next())
 			{
+				
 				//如果存在记录
 				record.setRecorded(true);
 				record.setWifi_ipv4(rs.getInt("wifi_ipv4"));

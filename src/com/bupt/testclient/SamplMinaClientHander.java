@@ -54,6 +54,7 @@ public class SamplMinaClientHander extends IoHandlerAdapter {
     @Override  
     public void sessionCreated(IoSession arg0) throws Exception {  
         // TODO Auto-generated method stub  
+    	System.out.println(1111);
   
     }  
   
